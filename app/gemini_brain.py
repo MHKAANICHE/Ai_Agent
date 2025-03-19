@@ -2,20 +2,21 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-genai.configure(
-    api_key=os.getenv("GEMINI_API_KEY"),
-    transport='rest',
-    client_options={
-        'api_endpoint': 'https://generativelanguage.googleapis.com/v1'  # v1 instead of v1beta
-    }
-)
+
+import os
+import google.generativeai as genai
+
 
 class GeminiCoder:
     def __init__(self):
-        load_dotenv()
-        api_key = os.getenv("GEMINI_API_KEY")
         
+        # Load API key from .env
+        # load_dotenv()
+        # api_key = os.getenv("GEMINI_API_KEY")
+
+
         # CORRECTED API ENDPOINT
+        # Load API key from GitHub Secrets
         genai.configure(
             api_key=os.getenv("GEMINI_API_KEY"),
             transport='rest',

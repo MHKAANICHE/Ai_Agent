@@ -4,9 +4,15 @@ from dotenv import load_dotenv  # Add this line
 
 class StateDB:
     def __init__(self):
-        load_dotenv()  # Load environment variables
-        self.client = MongoClient(os.getenv("MONGO_URI"))
-        self.db = self.client[os.getenv("DB_NAME", "code_copilot")]  # Add default
+        # Load environment variables
+        mongo_uri = os.getenv("MONGO_URI")
+        db_name = os.getenv("DB_NAME", "code_copilot")  # Default to "code_copilot" if not set
+        
+        if not mongo_uri:
+            raise ValueError("MONGO_URI environment variable is not set")
+        
+        self.client = MongoClient(mongo_uri)
+        self.db = self.client[db_name]
         self.sessions = self.db.sessions
     
     def log_operation(self, session_id, operation):
