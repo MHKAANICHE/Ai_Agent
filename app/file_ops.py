@@ -1,6 +1,7 @@
 import os
 import shutil
 
+# file : create, read, delete, modify, list
 def create_file(path, content=""):
     """Safely create a file with content, including parent directories."""
     try:
@@ -46,16 +47,77 @@ def modify_file(path, new_content):
         print(f"Error modifying file: {e}")
         return False
 
+def rename_file(old_path, new_path):
+    """Renames a file from old_path to new_path.
+
+    Args:
+        old_path: The original path of the file.
+        new_path: The new path for the file.
+    """
+    try:
+        os.rename(old_path, new_path)
+    except FileNotFoundError:
+        print(f"Error: File not found at {old_path}")
+    except OSError as e:
+        print(f"Error: Could not rename file: {e}")
+
+
 def list_files():
     """List files in current directory."""
     return "\n".join(os.listdir("."))    
+
+# Folder : create, delete, modify
+def create_folder(path):
+    """Creates a new folder at the specified path."""
+    try:
+        os.makedirs(path, exist_ok=True)  # exist_ok=True avoids errors if the folder already exists
+        return True, f"Folder created successfully at {path}"
+    except Exception as e:
+        return False, str(e)
+
+def delete_folder(path):
+    """Deletes an existing folder at the specified path."""
+    try:
+        shutil.rmtree(path)
+        return True, f"Folder deleted successfully at {path}"
+    except FileNotFoundError:
+        return False, f"Folder not found at {path}"
+    except Exception as e:
+        return False, str(e)
+
+def modify_folder(path, new_name=None):
+    """Modifies an existing folder. Currently only supports renaming."""
+    if new_name:
+        try:
+            new_path = os.path.join(os.path.dirname(path), new_name)
+            os.rename(path, new_path)
+            return True, f"Folder renamed successfully from {path} to {new_path}"
+        except FileNotFoundError:
+            return False, f"Folder not found at {path}"
+        except Exception as e:
+            return False, str(e)
+    else:
+        return False, "No modification specified."
+
+def rename_folder(old_path, new_path):
+    """Renames a folder from old_path to new_path."""
+    try:
+        shutil.move(old_path, new_path)
+        return True
+    except FileNotFoundError:
+        print(f"Error: Folder not found at {old_path}")
+        return False
+    except OSError as e:
+        print(f"Error: Could not rename folder: {e}")
+        return False
+# execute commands        
 
 def execute_command(command):
     """Safe command executor"""
     if not command:
         return "Error: No command to execute"
     
-    allowed_commands = ['create_file', 'read_file', 'delete_file','modify_file']
+    allowed_commands = ['create_file', 'read_file', 'delete_file','modify_file','rename_file','create_folder','delete_folder','modify_folder','rename_folder' ]
     if any(cmd in command for cmd in allowed_commands):
         try:
             exec(command)
