@@ -1,0 +1,151 @@
+Let’s structure this vision into actionable phases, using the "Librarian-Architect" framework. I’ll outline the conceptual workflow and components, organized to evolve your existing system step-by-step.
+
+---
+
+### **Phase 1: Install the Librarian (Memory Core)**
+**Objective**: Create a **context-aware conversation memory** system that understands relationships between discussions and project artifacts.
+
+#### **Components**:
+1. **Interaction Ledger**  
+   - *What*: MongoDB collection storing every user-AI exchange with metadata:  
+     ```plaintext
+     {
+       timestamp: "2024-03-15T14:30",
+       type: "code_change",
+       context_tags: ["#database", "#schema"],
+       summary: "Switched user schema to include OAuth2 providers",
+       linked_files: ["src/domain/user.ts", "infra/auth/adapter.ts"]
+     }
+     ```
+   - *Why*: Enables temporal and contextual recall.
+
+2. **Context Tagger**  
+   - *What*: Auto-labels interactions with topics (e.g., `#auth`, `#testing`, `#ddd`).  
+   - *How*: Use Gemini to analyze conversation snippets.  
+   - *Example*:  
+     *User says “Let’s add JWT auth” → Tags: `#security`, `#auth`*
+
+3. **Rolling Summarizer**  
+   - *What*: Condenses older conversations into:  
+     - **Project Decisions**: *"Authentication: JWT chosen over sessions on 3/15"*  
+     - **Architectural Edits**: *"Hexagonal layer 'infra/auth/' created for OAuth"*  
+   - *Why*: Avoids token limits while preserving key context.
+
+---
+
+### **Phase 2: Introduce the Architect Professor (Governance Core)**
+**Objective**: Embed architectural rules and patterns as **guardrails**, not constraints.
+
+#### **Components**:
+1. **Pattern Playbook** (Stored in MongoDB)  
+   - *Content*:  
+     ```plaintext
+     Hexagonal Rules:
+     - Core domain MUST NOT import framework code
+     - Adapters MUST implement port interfaces
+     
+     TDD Rules:
+     - New features require failing test first
+     - 80% test coverage enforced
+     ```
+   - *Enforcement*: AI cross-checks code changes against these rules.
+
+2. **Domain Model Tracker**  
+   - *What*: MongoDB document mapping DDD constructs:  
+     ```plaintext
+     {
+       aggregate: "User",
+       bounded_context: "Identity",
+       value_objects: ["Email", "PasswordHash"],
+       linked_bdd: "features/auth.feature#L12"
+     }
+     ```
+   - *Usage*: Prevents domain logic leakage into wrong layers.
+
+3. **Architectural Linter**  
+   - *Workflow*:  
+     1. User: *"Add Stripe payment"*  
+     2. AI:  
+        - *Checks Playbook*: "Payment must be in 'core/payment' with adapters"  
+        - *Proposes Structure*:  
+          ```plaintext
+          1. core/payment/ (Ports)
+          2. infra/payment/stripe-adapter.ts
+          3. Update dependency injection config
+          ```
+
+---
+
+### **Phase 3: Design Interaction Protocols**
+**Objective**: Balance user creativity with system rigor through **guided workflows**.
+
+#### **Components**:
+1. **Pacing Gatekeeper**  
+   - *Rule*: Complex tasks are split into AI-guided steps.  
+   - *Example*:  
+     *User*: “Build a social media feed!”  
+     *AI*:  
+     ```plaintext
+     Let’s approach this in Hexagonal layers:
+     1. Domain: Define `Feed` aggregate (DDD)
+     2. Infrastructure: Data sources (DB, APIs)
+     3. UI: React components
+     Where would you like to start?
+     ```
+
+2. **Technical Debt Ledger**  
+   - *What*: Tracks shortcuts needing future refactoring.  
+   - *Example Entry*:  
+     ```plaintext
+     Debt #45: Used direct DB call in UI layer (temp fix)
+     Impact: Violates Hexagonal
+     Scheduled Fix: 2024-04-01
+     ```
+
+3. **Contextual Help Modes**  
+   - **Explorer Mode**: "Just prototype!" → Relaxed rules, rapid iteration.  
+   - **Architect Mode**: "Prepare for production" → Strict TDD/DDD.  
+
+---
+
+### **Phase 4: Implement Feedback Loops**
+**Objective**: Let the system learn from user interactions to improve guidance.
+
+#### **Mechanisms**:
+1. **Pattern Adoption Rate**  
+   - *Metric*: Track how often users accept vs. override architectural suggestions.  
+   - *Learning*: If users often ignore `TDD-first` rule, AI adjusts prompting strategy.
+
+2. **Ambiguity Detector**  
+   - *What*: Flags vague requirements for clarification.  
+   - *Example*:  
+     *User*: “Make it scalable” → *AI*: “Define scalability goals:  
+     - Concurrent users?  
+     - Data volume?  
+     - Latency thresholds?”  
+
+---
+
+### **Phase 5: The White Book (Living Documentation)**
+**Objective**: Auto-generate a **decision log** that evolves with the project.
+
+#### **Structure**:
+1. **Sections**:
+   - **Architectural Chronicle**: Versioned pattern changes.  
+   - **Requirement Traces**: Links between user stories and code.  
+   - **Debt Register**: All temporary compromises.  
+
+2. **Access**:
+   - **CLI Command**: `copilot docs open` → Opens markdown in Codespace.  
+   - **Auto-Commit**: Changes to `docs/white-book.md` on key decisions.
+
+---
+
+### **Roadmap Summary**
+1. **Start with the Librarian** (Phase 1) → Foundation for context.  
+2. **Layer in Governance** (Phase 2) → Prevent architectural drift.  
+3. **Refine Interaction** (Phase 3) → Balance speed & quality.  
+4. **Enable Adaptation** (Phase 4) → AI learns user preferences.  
+5. **Document Everything** (Phase 5) → Create institutional memory.  
+
+Would you like to prioritize a specific phase for implementation?
