@@ -267,7 +267,7 @@ Let me know if you'd like to add more sections or customize this further!
 └── main.py
 
 
-## Allowed File and Folder Commands
+## Allowed Commands for Files and Folders 
 
 The following commands are permitted for interacting with files and folders:
 

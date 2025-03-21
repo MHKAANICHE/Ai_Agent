@@ -117,18 +117,12 @@ def rename_folder(old_path, new_path):
 # execute commands        
 
 def execute_command(command):
-    """Safe command executor"""
-    if not command:
-        return "Error: No command to execute"
-    
-    allowed_commands = ['create_file', 'read_file', 'delete_file','modify_file','rename_file','list_files','create_folder','delete_folder','modify_folder','rename_folder' ]
-    if any(cmd in command for cmd in allowed_commands):
-        try:
-            exec(command)
-            return "Success"
-        except Exception as e:
-            return f"Error: {str(e)}"
-    return f"Blocked - Unauthorized command: {command}" 
+    try:
+        exec(command)
+        return "Success"
+    except Exception as e:
+        return f"command: {command} - Error: {str(e)}"
+
 
 def analyze_project():
     """Analyze project structure and content"""

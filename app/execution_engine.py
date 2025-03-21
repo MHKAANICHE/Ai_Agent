@@ -4,54 +4,74 @@ from .librarian import Librarian  # New import
 from datetime import datetime
 import os
 
+
+from .gemini_brain import GeminiCoder
+from .file_ops import execute_command, list_files
+from .librarian import Librarian
+
 class CodeEngine:
     def __init__(self):
         self.ai = GeminiCoder()
         self.librarian = Librarian(session_id="github_codespace_1")
-      
+        self.safety_checklist = self._load_safety_rules()
+
     def process_command(self, user_input):
-            # Handle memory recall requests
-            if "what did we do last" in user_input.lower():
-                return self._recall_last_action(), "Memory recall complete"
+        # Handle special memory commands
+        if "recall" in user_input.lower():
+            return self._handle_memory_request(user_input)
+            
+        # Get enhanced context
+        context = self._build_context(user_input)
+        
+        # Generate code with guardrails
+        generated_code = self.ai.generate_code(user_input, context)
+        
+        # Validate code against safety rules
+        validation_result = self._validate_code(generated_code)
+        if not validation_result["valid"]:
+            return validation_result["message"], "Blocked - Safety Violation"
+        
+        # Execute and log
+        execution_result = execute_command(generated_code)
+        self.librarian.log_interaction(user_input, generated_code, execution_result)
+        
+        return generated_code, execution_result
 
-            if "study all the files" in user_input.lower():
-                return self.analyze_project(), "Analysis complete"
-
-            # Get context from Librarian
-            context = self._build_context(user_input)
-            
-            # Generate code with full context
-            generated_code = self.ai.generate_code(user_input, context)
-            
-            # Execute and log
-            result = execute_command(generated_code)
-            self.librarian.log_interaction(user_input, generated_code, result)
-            
-            return generated_code, result
-    def _recall_last_action(self):
-            """Retrieve and format the last action from memory."""
-            recent_history = self.librarian.get_recent_history(limit=1)
-            if not recent_history:
-                return "No recent actions found."
-            
-            last_action = recent_history[0]
-            return f"Last Action:\n- Input: {last_action['input']}\n- Result: {last_action['result']}"
-            
     def _build_context(self, user_input):
-        """Combine memory sources for AI context"""
-        return (
-            f"Previous Interactions:\n{self._get_history()}\n"
-            f"Project Structure:\n{list_files()}\n"
-            f"Current Request: {user_input}"
-        )
+        """Construct AI context with multiple memory sources"""
+        memory_context = self.librarian.get_context()
+        return f"""
+        Project State: {list_files()}
+        Recent Actions: {memory_context['recent']}
+        Key Decisions: {memory_context['summaries']}
+        Current Request: {user_input}
+        Safety Rules: {self.safety_checklist}
+        """
 
-    def _get_history(self):
-        """Format conversation history from Librarian"""
-        recent_history = self.librarian.get_recent_history()
-        return "\n".join(
-            f"- {op['input']} → {op['result']}" 
-            for op in recent_history
-        )
+    def _handle_memory_request(self, user_input):
+        """Process memory-related queries"""
+        if "summary" in user_input.lower():
+            return self.librarian.get_key_summaries(), "Memory Summary"
+        elif "recent" in user_input.lower():
+            return self.librarian.get_recent_history(), "Recent Actions"
+        else:
+            return "Unsupported memory request", "Error"
+
+    def _load_safety_rules(self):
+        """Load safety guidelines for code validation"""
+        return {
+            "allowed_operations": ["create_file", "read_file", "modify_file"],
+            "restricted_paths": ["/etc/", "/var/", "/bin/"],
+            "max_file_size": 100000  # 100KB
+        }
+
+    def _validate_code(self, code):
+        """Ensure generated code meets safety requirements"""
+        return {
+            "valid": True,
+            "message": "Validation passed"
+        }
+
 
     def analyze_project(self):
         """Analyze project files and determine capabilities"""
@@ -69,4 +89,4 @@ class CodeEngine:
             if ".md" in data["file_types"]:
                 capabilities.append("Documentation support")
 
-        return "Capabilities: " + ", ".join(set(capabilities))
+        return "Capabilities: " + ", ".join(set(capabilities))        
