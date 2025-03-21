@@ -37,16 +37,24 @@ class CodeEngine:
         
         return generated_code, execution_result
 
+   
     def _build_context(self, user_input):
         """Construct AI context with multiple memory sources"""
         memory_context = self.librarian.get_context()
         return f"""
         Project State: {list_files()}
-        Recent Actions: {memory_context['recent']}
-        Key Decisions: {memory_context['summaries']}
+
+        Project State:
+        - Files: {len(memory_context['project_state']['files'])} files
+        - Recent Changes: {memory_context['project_state']['recent_changes']}
+        
+        Memory Context:
+        - Recent Actions: {memory_context['recent']}
+        - Key Decisions: {memory_context['summaries']}
+        
         Current Request: {user_input}
         Safety Rules: {self.safety_checklist}
-        """
+        """        
 
     def _handle_memory_request(self, user_input):
         """Process memory-related queries"""
