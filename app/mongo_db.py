@@ -2,6 +2,7 @@ from pymongo import MongoClient
 import os
 from dotenv import load_dotenv  # Add this line
 
+
 class StateDB:
     def __init__(self):
         # Load environment variables
@@ -16,6 +17,7 @@ class StateDB:
         self.sessions = self.db.sessions
     
     def log_operation(self, session_id, operation):
+        """Log an operation with metadata."""
         self.sessions.update_one(
             {"session_id": session_id},
             {"$push": {"operations": operation}},
@@ -23,4 +25,5 @@ class StateDB:
         )
     
     def get_history(self, session_id):
+        """Retrieve all operations for a session."""
         return self.sessions.find_one({"session_id": session_id}) or {"operations": []}

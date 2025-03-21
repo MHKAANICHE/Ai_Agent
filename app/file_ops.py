@@ -37,4 +37,14 @@ def execute_command(command):
             return f"Error: {str(e)}"
     return "Blocked: Unauthorized command"    
 
+def analyze_project():
+    """Analyze project structure and content"""
+    project_structure = {}
+    for root, dirs, files in os.walk("."):
+        relative_path = os.path.relpath(root, ".")
+        project_structure[relative_path] = {
+            "files": files,
+            "file_types": set(os.path.splitext(f)[1] for f in files)
+        }
+    return project_structure
 

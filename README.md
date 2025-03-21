@@ -98,6 +98,23 @@ MONGO_URI=mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/code_copilo
 DB_NAME=code_copilot
 ```
 
+Check Your environement 
+```bash
+echo $GEMINI_API_KEY
+echo $MONGO_URI
+echo $DB_NAME
+```
+And 
+
+```bash
+python3 -c "
+from pymongo import MongoClient
+import os
+client = MongoClient(os.getenv('MONGO_URI'))
+print(client.server_info())
+"
+```
+
 ### 4. **Run the Copilot**
 ```bash
 python main.py
