@@ -267,3 +267,20 @@ Let me know if you'd like to add more sections or customize this further!
 └── main.py
 
 
+## Allowed File and Folder Commands
+
+The following commands are permitted for interacting with files and folders:
+
+create_file
+read_file
+delete_file
+modify_file
+rename_file
+list_files
+create_folder
+delete_folder
+modify_folder
+rename_folder
+execute_command
+analyze_project
+
