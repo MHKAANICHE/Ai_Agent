@@ -63,8 +63,12 @@ def rename_file(old_path, new_path):
 
 
 def list_files():
-    """List files in current directory."""
-    return "\n".join(os.listdir("."))    
+    """Lists all files in the current project directory."""
+    files = []
+    for root, _, filenames in os.walk("."):
+        for filename in filenames:
+            files.append(os.path.join(root, filename))
+    return files  
 
 # Folder : create, delete, modify
 def create_folder(path):
@@ -117,14 +121,14 @@ def execute_command(command):
     if not command:
         return "Error: No command to execute"
     
-    allowed_commands = ['create_file', 'read_file', 'delete_file','modify_file','rename_file','create_folder','delete_folder','modify_folder','rename_folder' ]
+    allowed_commands = ['create_file', 'read_file', 'delete_file','modify_file','rename_file','list_files','create_folder','delete_folder','modify_folder','rename_folder' ]
     if any(cmd in command for cmd in allowed_commands):
         try:
             exec(command)
             return "Success"
         except Exception as e:
             return f"Error: {str(e)}"
-    return "Blocked: Unauthorized command"    
+    return f"Blocked - Unauthorized command: {command}" 
 
 def analyze_project():
     """Analyze project structure and content"""
